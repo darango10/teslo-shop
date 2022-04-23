@@ -1,9 +1,9 @@
 import { Typography } from "@mui/material";
 import type { NextPage } from "next";
-import { ShopLayout } from "../components/layout/ShopLayout";
+import { ShopLayout } from "../components/layout";
 import { SideMenu } from "../components/ui";
 import { initialData } from "../database/products";
-import { ProductList } from "../components/products/ProductList";
+import { ProductList } from "../components/products";
 
 const Home: NextPage = () => {
   return (
