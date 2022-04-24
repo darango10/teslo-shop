@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import { initialData } from "../../database/products";
 import {
   Box,
@@ -18,7 +18,11 @@ const productsInCart = [
   initialData.products[2],
 ];
 
-export const CartList = () => {
+interface Props {
+  editable: boolean;
+}
+
+export const CartList: FC<Props> = ({ editable }) => {
   return (
     <>
       {productsInCart.map((product) => (
@@ -28,9 +32,10 @@ export const CartList = () => {
               <Link>
                 <CardActionArea>
                   <CardMedia
-                    image={`products/${product.images[0]}`}
+                    image={`/products/${product.images[0]}`}
                     component={"img"}
                     sx={{ borderRadius: "5px" }}
+                    alt={product.images[0]}
                   />
                 </CardActionArea>
               </Link>
@@ -42,7 +47,11 @@ export const CartList = () => {
               <Typography variant={"body1"}>
                 Talla: <strong>M</strong>
               </Typography>
-              <Counter />
+              {editable ? (
+                <Counter />
+              ) : (
+                <Typography variant={"h6"}>3 items</Typography>
+              )}
             </Box>
           </Grid>
           <Grid
@@ -53,9 +62,11 @@ export const CartList = () => {
             flexDirection={"column"}
           >
             <Typography variant={"subtitle1"}>${product.price}</Typography>
-            <Button variant={"text"} color={"secondary"}>
-              Remover
-            </Button>
+            {editable && (
+              <Button variant={"text"} color={"secondary"}>
+                Remover
+              </Button>
+            )}
           </Grid>
         </Grid>
       ))}
