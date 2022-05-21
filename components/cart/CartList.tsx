@@ -1,5 +1,4 @@
-import React, { FC } from "react";
-import { initialData } from "../../database/products";
+import React, { FC, useContext } from "react";
 import {
   Box,
   Button,
@@ -11,31 +10,42 @@ import {
 } from "@mui/material";
 import NextLink from "next/link";
 import { Counter } from "../ui";
-
-const productsInCart = [
-  initialData.products[0],
-  initialData.products[1],
-  initialData.products[2],
-];
+import { CartContext } from "../../context";
+import { ICartProduct } from "../../interfaces";
 
 interface Props {
   editable: boolean;
 }
 
 export const CartList: FC<Props> = ({ editable }) => {
+  const { cart, updateCartQuantity } = useContext(CartContext);
+
+  const onNewCartQuantityValue = (
+    product: ICartProduct,
+    newQuantityValue: number
+  ) => {
+    product.quantity = newQuantityValue;
+    updateCartQuantity(product);
+  };
+
   return (
     <>
-      {productsInCart.map((product) => (
-        <Grid container spacing={2} sx={{ mb: 1 }} key={product.slug}>
+      {cart.map((product) => (
+        <Grid
+          container
+          spacing={2}
+          sx={{ mb: 1 }}
+          key={product.slug + product.size}
+        >
           <Grid item xs={3}>
-            <NextLink href={"/product/slug"} passHref>
+            <NextLink href={`/product/${product.slug}`} passHref>
               <Link>
                 <CardActionArea>
                   <CardMedia
-                    image={`/products/${product.images[0]}`}
+                    image={`/products/${product.images}`}
                     component={"img"}
                     sx={{ borderRadius: "5px" }}
-                    alt={product.images[0]}
+                    alt={product.images}
                   />
                 </CardActionArea>
               </Link>
@@ -48,9 +58,19 @@ export const CartList: FC<Props> = ({ editable }) => {
                 Talla: <strong>M</strong>
               </Typography>
               {editable ? (
-                <Counter />
+                <Counter
+                  inStock={product.inStock}
+                  quantity={
+                    product.quantity > product.inStock
+                      ? product.inStock
+                      : product.quantity
+                  }
+                  updatedQuantity={(value) =>
+                    onNewCartQuantityValue(product, value)
+                  }
+                />
               ) : (
-                <Typography variant={"h6"}>3 items</Typography>
+                <Typography variant={"h6"}>{product.quantity} items</Typography>
               )}
             </Box>
           </Grid>

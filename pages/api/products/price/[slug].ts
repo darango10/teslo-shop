@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "../../../database";
-import { Product } from "../../../models";
-import { IProduct } from "../../../interfaces";
+import { db } from "../../../../database";
+import { Product } from "../../../../models";
 
-type Data = { message: string } | IProduct;
+type Data = { message: string } | { price: number };
 
 export default function handler(
   req: NextApiRequest,
@@ -11,7 +10,7 @@ export default function handler(
 ) {
   switch (req.method) {
     case "GET":
-      return getProductBySlug(req, res);
+      return getPriceBySlug(req, res);
 
     default:
       return res.status(400).json({
@@ -20,11 +19,11 @@ export default function handler(
   }
 }
 
-async function getProductBySlug(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  console.log("REQ PRODUCTO");
+async function getPriceBySlug(req: NextApiRequest, res: NextApiResponse<Data>) {
+  console.log("REQ PRICE");
+  await new Promise((f) => {
+    setTimeout(f, 1000);
+  });
   await db.connect();
   const { slug } = req.query;
   const product = await Product.findOne({ slug }).lean();
@@ -36,5 +35,5 @@ async function getProductBySlug(
     });
   }
 
-  return res.json(product);
+  return res.json({ price: product.price });
 }
