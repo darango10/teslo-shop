@@ -10,10 +10,18 @@ interface Props {
 
 export interface CartState {
   cart: ICartProduct[];
+  numberOfItems: number;
+  subtotal: number;
+  tax: number;
+  total: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
   cart: [],
+  numberOfItems: 0,
+  subtotal: 0,
+  tax: 0,
+  total: 0,
 };
 
 export const CartProvider: FC<Props> = ({ children }) => {
@@ -36,6 +44,29 @@ export const CartProvider: FC<Props> = ({ children }) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    const numberOfItems = state.cart.reduce(
+      (prev, current) => current.quantity + prev,
+      0
+    );
+    const subtotal = state.cart.reduce(
+      (prev, current) => current.price * current.quantity + prev,
+      0
+    );
+    const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
+    const orderSummary = {
+      numberOfItems,
+      subtotal,
+      tax: subtotal * taxRate,
+      total: subtotal * (1 + taxRate),
+    };
+
+    dispatch({
+      type: "[CART] - Update order summary",
+      payload: orderSummary,
+    });
+  }, [state.cart]);
 
   useEffect(() => {
     if (isReloading.current) {
@@ -83,12 +114,17 @@ export const CartProvider: FC<Props> = ({ children }) => {
     dispatch({ type: "[CART] - Change cart quantity", payload: product });
   };
 
+  const removeCartProduct = (product: ICartProduct) => {
+    dispatch({ type: "[CART] - Remove product in cart", payload: product });
+  };
+
   return (
     <CartContext.Provider
       value={{
         ...state,
         addProductToCart,
         updateCartQuantity,
+        removeCartProduct,
       }}
     >
       {children}

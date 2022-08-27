@@ -22,6 +22,7 @@ const Home: NextPage = () => {
 
       {isLoading ? <FullScreenLoading /> : <ProductList products={products} />}
       <SideMenu />
+      <button></button>
     </ShopLayout>
   );
 };
